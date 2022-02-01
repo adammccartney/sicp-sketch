@@ -11,6 +11,8 @@
                  (fib-rec (- n 2))))))
 
 
+(fib-rec 35)
+
 #| linear iterative version of fib 
  | this grows linearly |#
 (define (fib n)
@@ -20,9 +22,8 @@
     b
     (fib-iter (+ a b) a (- count 1))))
 
-(
 
-(fib 100000)
+(fib 1000)
 
 (fib-rec 100)
 
