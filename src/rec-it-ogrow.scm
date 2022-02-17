@@ -23,7 +23,7 @@
     (fib-iter (+ a b) a (- count 1))))
 
 
-(fib 1000)
+(fib 15)
 
 (fib-rec 100)
 
