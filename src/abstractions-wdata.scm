@@ -137,6 +137,7 @@
 
 (reverse squares)
 
+
 #| Exercise 2.27
  | Modify your reverse procedure of exercise 2.18 to produce a deep-reverse
  | procedure that takes a list as argument and returns as its value the list
@@ -150,4 +151,39 @@
  | (deep-reverse x)
  | ((4 3) (2 1))
  |#
+
+(define alist (list (list 1 2) (list 3 4)))
+(reverse alist)
+
+(cdr alist)
+
+(define (list? x)
+  (and (pair? x)
+       (not (null? x))))
+
+(define (atom? x)
+  (and (not (pair? x))
+       (not (null? x))))
+
+(define (deep-reverse items)
+  (define (iter items result)
+    (if (null? items)
+      result
+      (if (list? (car items))
+        (iter (cdr items) (cons (reverse (car items)) result))
+        (iter (cdr items) (const (car items)) result))))
+  (deep-reverse items nil))
+
+(define (deep-reverse items)
+  (define (iter items result)
+    (if (null? items)
+      result
+      (display items))))
+    
+
+(list? (car alist))
+
+(deep-reverse alist)
+(deep-reverse squares)
+
 
