@@ -169,19 +169,16 @@
   (define (iter items result)
     (if (null? items)
       result
-      (if (list? (car items))
-        (iter (cdr items) (cons (reverse (car items)) result))
-        (iter (cdr items) (const (car items)) result))))
-  (deep-reverse items nil))
+      (iter (reverse (car (cdr items))) (cons (reverse (car items)) result))))
+  (iter items nil))
 
-(define (deep-reverse items)
-  (define (iter items result)
-    (if (null? items)
-      result
-      (display items))))
-    
+(list? (cdr alist))
 
-(list? (car alist))
+(car (cdr alist))
+
+
+(cons (reverse (car (cdr alist))) (cons (reverse (car alist)) '()))
+
 
 (deep-reverse alist)
 (deep-reverse squares)
