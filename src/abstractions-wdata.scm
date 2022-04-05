@@ -124,9 +124,9 @@
 
 (cdr items)
 
-(define nil '())
 
 (define (reverse items) 
+  (define nil '())
   (define (iter items result) 
     (if (null? items) 
         result 
@@ -157,30 +157,44 @@
 
 (cdr alist)
 
-(define (list? x)
-  (and (pair? x)
-       (not (null? x))))
-
 (define (atom? x)
   (and (not (pair? x))
        (not (null? x))))
 
+#| this deep-reverse works for lists with two sublists |#
 (define (deep-reverse items)
-  (define (iter items result)
-    (if (null? items)
-      result
-      (iter (reverse (car (cdr items))) (cons (reverse (car items)) result))))
-  (iter items nil))
+  (define (rev-in-place alist)
+    (cons (reverse (car (cdr alist))) (cons (reverse (car alist)) '())))
+  (define shallow-reverse (reverse items))
+  (rev-in-place shallow-reverse))
 
-(list? (cdr alist))
+(define (rev-lnode l)
+  (reverse (car (cdr l))))
 
-(car (cdr alist))
+(define (rev-rnode l)
+  (reverse (car l)
+
+(if (list? (cdr l))
+    (rev-node l)
+    l)))
+
+(define clist (cdr (list 1 2 3)))
+  (reverse (car (cdr l))))
+
+(define clist (list (list 1 2 3) (list 4 5) (list 6 7)))
+
+(define blist (list 1 2))
+
+(check-list blist)
 
 
-(cons (reverse (car (cdr alist))) (cons (reverse (car alist)) '()))
 
+
+(rev-in-place (list (list 1 2) (list 3 4)))
+
+(check-list alist)
+(check-list blist)
 
 (deep-reverse alist)
-(deep-reverse squares)
 
 
