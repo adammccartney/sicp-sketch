@@ -21,6 +21,10 @@
   (map (lambda (x) (* x x))
        items))
 
+(define ulist (list 1 2 3 4))
+
+(square-list ulist)
+
 
 #| Exercise 2.23
  | The procedure for-each is similar to map. It takes as arguments the
@@ -154,6 +158,7 @@
 
 (define alist (list (list 1 2) (list 3 4)))
 (reverse alist)
+(deep-reverse alist)
 
 (cdr alist)
 
@@ -163,10 +168,35 @@
 
 #| this deep-reverse works for lists with two sublists |#
 (define (deep-reverse items)
-  (define (rev-in-place alist)
+    (define (reverse items) 
+      (define nil '())
+      (define (iter items result) 
+        (if (null? items) 
+            result 
+            (iter (cdr items) (cons (car items) result)))) 
+      (iter items nil)) 
+  (define (rev-in-place alist)  #| this assumes that alist is a pair of lists |#
+    (define (iter-rev alist result)
     (cons (reverse (car (cdr alist))) (cons (reverse (car alist)) '())))
-  (define shallow-reverse (reverse items))
-  (rev-in-place shallow-reverse))
+  (reverse (rev-in-place (reverse items))))
+
+
+#| here is a version that uses map |#
+(define (deep-reverse items)
+  (define (reverse items) 
+        (define nil '())
+        (define (iter items result) 
+          (if (null? items) 
+              result 
+              (iter (cdr items) (cons (car items) result)))) 
+        (iter items nil)) 
+  (reverse (map reverse items)))
+
+(define alist (list (list 1 2) (list 3 4) (list 5 6)))
+(define blist (list (list 1 2 3) (list 4 5 6) (list 7 8 9) (list 10 11 12)))
+(deep-reverse alist)
+(deep-reverse blist)
+
 
 (define (rev-lnode l)
   (reverse (car (cdr l))))
@@ -187,7 +217,8 @@
 
 (check-list blist)
 
-
+(deep-reverse clist)
+(deep-reverse alist)
 
 
 (rev-in-place (list (list 1 2) (list 3 4)))
@@ -196,5 +227,60 @@
 (check-list blist)
 
 (deep-reverse alist)
+
+
+(define (nil? alist)
+  (not (atom? alist)))
+
+(null? '())
+
+(atom? '())
+
+
+(car '())
+
+(define alist (list (list 1 2) (list 3 4)))
+
+
+(null? (cdr (cdr alist)))
+
+
+(define dlist (list (list 2 3) (list 4 5) (list 6 7) (list 8 9)))
+
+(cons (reverse (car (cdr dlist))) (cons (reverse (car dlist)) '()))
+
+
+(count-nodes dlist)
+(cdr dlist)
+
+(cdr (cdr alist))
+
+(pair? alist)
+
+#| Exercise 2.28: Write a procedure fringe that takes as argument 
+ | a tree (represented as a list) and returns a list whose
+ | elements are all the leaves of the tree arranged in le-toright order. 
+ | For example,
+ | (define x (list (list 1 2) (list 3 4)))
+ | (fringe x)
+ | (1 2 3 4)
+ | (fringe (list x x))
+ | (1 2 3 4 1 2 3 4)
+ |#
+
+(define (fringe x)
+  (define nil '())
+  (cond ((null? x) nil)
+        ((not (pair? x)) (list x))  #| trick is to test if node is a pair |#
+        (else (append (fringe (car x)) (fringe (cdr x))))))
+
+(fringe (list 1 2 3 4 5 6))
+
+(fringe alist)
+
+(if (not (pair? (car items)))
+  (car items))
+
+
 
 
