@@ -318,6 +318,46 @@
 (lambda (x) (accumulate * 1 x)) 
 
 
+#| dotted tail notation 
+ |  ex 2.20 : design a function that uses dotted tail notation
+ |            should return a list of integers matching the parity of the first arg 
+ |
+ |      (same-parity 1 2 3 4 5 6 7)
+ |      (1 3 5 7)
+ |
+ |      (same-parity 2 3 4 5 6 7)
+ |      (2 4 6)
+ |#
+
+#| accumulate |#
+(define (accumulate op initial sequence)
+  (if (null? sequence)
+    initial
+    (op (car sequence)
+        (accumulate op initial (cdr sequence)))))
+
+(accumulate + 0 (list 1 2 3 4 5))
+
+#| filter |#
+(define (filter predicate sequence)
+  (cond ((null? sequence) '())
+        ((predicate (car sequence))
+         (cons (car sequence)
+               (filter predicate (cdr sequence))))
+        (else (filter predicate (cdr sequence)))))
+
+(define (same-parity . x)
+  (if (even? (car x)) 
+             (filter even? x)
+        (filter odd? x)))
+
+(same-parity 4 1 2 3 4 5 6 7 8 9)
+
+
+(define (f x . y)
+  (accumulate + x y))
+
+(filter even? '(1 2 3 4 5 6))
 
 
 
