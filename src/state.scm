@@ -60,5 +60,80 @@
     (op (car sequence)
         (accumulate op initial (cdr sequence)))))
 
+;; Exercise 3.2
+#| In software-testing applications, it is useful to be able to count the 
+ | number of times a given procedure is called during the course of a computation. 
+ | Write a procedure make-monitored that takes as input a procedure, f, that itself 
+ | takes one input. The result returned by make-monitored is a third procedure, say 
+ | mf, that keeps track of the number of times it has been called by maintaining an 
+ | internal counter. If the input to mf is the special symbol how-many-calls?, then 
+ | mf returns the value of the counter. If the input is the special symbol reset-count, 
+ | then mf resets the counter to zero. For any other input, mf returns the result of 
+ | calling f on that input and increments the counter. For instance, we could make a 
+ | monitored version of the sqrt procedure:
+
+ ;;     (define s (make-monitored sqrt))
+
+ ;;     (s 100)
+ ;;     10
+
+ ;;     (s 'how-many-calls?)
+ ;;     1
+  |#
+
+(define (sqrt x)
+  (define (square x) 
+    (* x x))
+  (define (average a b)
+    (/ (+ a b) 2))
+  (define (good-enough? guess)
+    (< (abs (- (square guess) x)) 0.001))
+  (define (improve guess)
+    (average guess (/ x guess)))
+  (define (sqrt-iter guess)
+    (if (good-enough? guess)
+      guess
+      (sqrt-iter (improve guess))))
+  (sqrt-iter 1.0))
+
+(define (mf sum)
+  (set! sum (+ sum 1))
+  sum)
+
+(mf 0)
+
+(define (make-monitored f)
+  (define sum 0)
+  (define (mf count)
+      (set! sum (+ count 1))
+    sum)
+    (define (dispatch m)
+      (cond ((eq? m 'how-many-calls?) (mf sum))
+            ((number? m) (f m))
+            (else (error "Unknown request -- MAKE MONITORED"
+                         m))))
+    dispatch)
+
+(define s (make-monitored sqrt))
+
+(s 100)
+
+(s 'how-many-calls?)
+
+(define (atom? x)
+  (and (not (pair? x))
+       (not (null? x))))
+
+
+(define (sequencer a b)
+ (define (adder a b)
+   (+ a b))
+ (define (subtractor a b)
+   (- a b))
+ (and (display (subtractor a b))
+      (adder a b)))
+
+(sequencer 10 20)
+
 
 
