@@ -25,6 +25,16 @@
 
 (square-list ulist)
 
+(+ 1 2)
+
+
+(define mylist (list 1 2 3 4 5))
+
+(car mylist)
+(cdr mylist)
+
+
+
 
 #| Exercise 2.23
  | The procedure for-each is similar to map. It takes as arguments the

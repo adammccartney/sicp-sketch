@@ -1,4 +1,4 @@
-t;; mostly snippets copied from scheme programming book
+;; mostly snippets copied from scheme programming book
 
 ;; to copy a list
 (define list-copy
