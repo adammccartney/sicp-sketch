@@ -1,7 +1,8 @@
 #!/usr/bin/guile3.0 \
 -e main -s
 !#
-(use-modules (ice-9 regex)
+(use-modules (ice-9 format)
+             (ice-9 regex)
              (ice-9 textual-ports))
 (define (kubeconfig? str)
   ;; test if the string contains KUBECONFIG
@@ -14,27 +15,44 @@
 
 ;; TODO make a hash map 
 (define (create-menu opts)
-  (let ((menu-ls '()))
+  (display "Please select one of the following:")
+  (newline)
     (define (iter-create-menu opts pos res)
       ;; add a numeric prefix and display a list of options
-      
       (if (null? opts)
-          (menu-ls)
+          menu-ls
           (begin
-            (assoc-set! menu-ls pos (car opts))
+            (set! menu-ls (acons pos (car opts) menu-ls))
+            (display (format #f "~d →  ~s" pos (cdr (assq pos menu-ls))))
+            (newline)
             (iter-create-menu (cdr opts) (+ pos 1) menu-ls))))
-  (iter-create-menu opts 1 menu-ls)))
+  (define menu-ls '())
+  (iter-create-menu opts 1 menu-ls))
 
 
 (define (main args)
-   (map (lambda (arg) (display arg) (display " "))
-       (cdr args))
-  (newline)
+  ;; Allow the user to select from existing KUBECONFIG_<TYPE> files
+  ;; these should be available in the current shell environment
+  ;; upon selection, start a subshell where where the selected
+  ;; variable is used to set the KUBECONFIG variable.
+  ;; Note that the first arg is a temporary output file
+  (define /mq (car args)) ;; first arg is a msg queue
+  (define (send-mq pxmq msg) ;; write to a posix msg queue
+    (system* "pmsg_send" "-n" pxmq msg))
+  (define uinput (lambda ()(read)))
+  (define kube-config-files)
+  (define choice)
+  (define (getcfg choice kube-config-files)
+     (let ((envvar (cdr (assq choice kube-config-files))))
+       (car (cdr (string-split envvar #\=)))))
   (let ([kconfig-opts (filter kubeconfig? (environ))])
     (if kconfig-opts
         (begin  ;; this is the main io loop
-          (display-menu kconfig-opts)))
-  (newline))
+          (set! kube-config-files (create-menu kconfig-opts))
+          (set! choice (uinput))
+          (let ([kcfg (getcfg choice kube-config-files)])
+            (send-mq /mq kcfg))))))
+
 
 ;; tests
 (define test-env-kubeconfig
@@ -51,9 +69,5 @@
 
 ;; scratch
 
-(define getinput
-  (let ((res (get-char (current-input-port))))
-      (display res)))
 
-
-alist
+(cdr (string-split "KUBECONFIG_PROD=/t/c/b" #\=))
