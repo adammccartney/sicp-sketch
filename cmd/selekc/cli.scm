@@ -2,8 +2,8 @@
 -e main -s
 !#
 (use-modules (ice-9 format)
-             (ice-9 regex)
-             (ice-9 textual-ports))
+             (ice-9 regex))
+
 (define (kubeconfig? str)
   ;; test if the string contains KUBECONFIG
   ;; (kubeconfig? "KUBECONFIG_PROD=/path/to/thing")
@@ -13,7 +13,6 @@
         res)
       #f))
 
-;; TODO make a hash map 
 (define (create-menu opts)
   (display "Please select one of the following:")
   (newline)
@@ -29,6 +28,10 @@
   (define menu-ls '())
   (iter-create-menu opts 1 menu-ls))
 
+(define (send-mq pxmq msg)
+  ;; write to a posix msg queue
+    (system* "pmsg_send" "-n" pxmq msg))
+  
 
 (define (main args)
   ;; Allow the user to select from existing KUBECONFIG_<TYPE> files
@@ -36,9 +39,7 @@
   ;; upon selection, start a subshell where where the selected
   ;; variable is used to set the KUBECONFIG variable.
   ;; Note that the first arg is a temporary output file
-  (define /mq (car args)) ;; first arg is a msg queue
-  (define (send-mq pxmq msg) ;; write to a posix msg queue
-    (system* "pmsg_send" "-n" pxmq msg))
+  (define /mq (car (cdr args))) ;; first arg is a msg queue
   (define uinput (lambda ()(read)))
   (define kube-config-files)
   (define choice)
@@ -53,21 +54,11 @@
           (let ([kcfg (getcfg choice kube-config-files)])
             (send-mq /mq kcfg))))))
 
-
 ;; tests
 (define test-env-kubeconfig
   (list "PATH=/k/y/z" "KUBECONFIG_PROD=/somewhere/config.yaml"))
 
 (filter kubeconfig? '("KUBECONFIG_PROD" "NOTHING"))
 
-(define t
-  (let ((res (lambda ()(filter even? '(1 2 3 4)))))
-    res))
-
-(t)
-
-
 ;; scratch
 
-
-(cdr (string-split "KUBECONFIG_PROD=/t/c/b" #\=))
