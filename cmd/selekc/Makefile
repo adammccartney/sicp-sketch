@@ -4,7 +4,7 @@
 all: selekc.cli
 
 selekc.cli:
-	ln -f cli.scm ${HOME}/bin/selekc.cli
+	cp -v cli.scm ${HOME}/bin/selkc.cli
 
 clean:
 	unlink ${HOME}/bin/selkc.cli

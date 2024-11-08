@@ -1,6 +1,6 @@
-#!/usr/bin/guile3.0 \
--e main -s
+#!/usr/bin/guile3.0 -s
 !#
+
 (use-modules (ice-9 format)
              (ice-9 regex))
 
@@ -31,15 +31,13 @@
 (define (send-mq pxmq msg)
   ;; write to a posix msg queue
     (system* "pmsg_send" "-n" pxmq msg))
-  
 
-(define (main args)
+(define (main mq)
   ;; Allow the user to select from existing KUBECONFIG_<TYPE> files
   ;; these should be available in the current shell environment
   ;; upon selection, start a subshell where where the selected
   ;; variable is used to set the KUBECONFIG variable.
   ;; Note that the first arg is a temporary output file
-  (define /mq (car (cdr args))) ;; first arg is a msg queue
   (define uinput (lambda ()(read)))
   (define kube-config-files)
   (define choice)
@@ -52,7 +50,11 @@
           (set! kube-config-files (create-menu kconfig-opts))
           (set! choice (uinput))
           (let ([kcfg (getcfg choice kube-config-files)])
-            (send-mq /mq kcfg))))))
+            (send-mq mq kcfg))))))
+
+;; Here starts the stuff
+(main (cadr (command-line)))
+(newline)
 
 ;; tests
 (define test-env-kubeconfig
